@@ -98,6 +98,8 @@
     </style>
   </head>
 
+  <!-- エクリプステスト小島 -->
+
   <body>
     <header class="l-header" id="header">
       <div class="l-header_bar">
