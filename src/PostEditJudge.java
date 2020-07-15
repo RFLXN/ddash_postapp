@@ -1,0 +1,50 @@
+import postapp.OracleAccess;
+import postapp.exception.EmptyInputtedException;
+import postapp.parameter.Post;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+public class PostEditJudge extends HttpServlet {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setCharacterEncoding("utf-8");
+
+        String pw = request.getParameter("pw");
+        String postNumber = request.getParameter("postnumber");
+        Post post = null;
+
+        // パスワードが空白の場合例外発生
+        if(pw.equals("")) {
+            throw new EmptyInputtedException();
+        }
+
+        boolean isPwCorrect = false;
+        try {
+            OracleAccess access = new OracleAccess();
+
+            post = access.postSelect(postNumber);
+
+            if(pw.equals(post.getPw())) {
+                isPwCorrect = true;
+            }
+            access.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(isPwCorrect) {
+            response.sendRedirect("postview?postnumber="+postNumber+"&isedit=true");
+        } else {
+            request.setAttribute("postnumber", postNumber);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("pwincorrect");
+
+            dispatcher.forward(request, response);
+        }
+    }
+}
